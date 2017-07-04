@@ -20,10 +20,10 @@ func main() {
 		Repository github4.Repository
 	}
 	err := githubClient.Do(`
-		query {
-			repository(owner:"openshift",name:"origin") {
+		query($owner: String!, $name: String!, $prnumber: Int!) {
+			repository(owner: $owner, name: $name) {
 				description
-				pullRequest(number:14521) {
+				pullRequest(number: $prnumber) {
 					author {
 						__typename
 						login
@@ -31,7 +31,7 @@ func main() {
 							company
 						}
 					}
-					timeline(first:10) {
+					timeline(first: 10) {
 						nodes {
 							__typename
 						}
@@ -39,7 +39,11 @@ func main() {
 				}
 			}
 		}
-	`, nil, &r)
+	`, map[string]interface{}{
+		"owner":    "openshift",
+		"name":     "origin",
+		"prnumber": 14521,
+	}, &r)
 	if err != nil {
 		log.Fatal(err)
 	}

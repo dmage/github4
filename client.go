@@ -48,11 +48,18 @@ func (c *Client) Do(query string, variables map[string]interface{}, response int
 	}
 
 	var v struct {
-		Data json.RawMessage
+		Data   json.RawMessage
+		Errors []struct {
+			Message string
+		}
 	}
 	err = json.NewDecoder(resp.Body).Decode(&v)
 	if err != nil {
 		return err
+	}
+
+	if len(v.Errors) > 0 {
+		return fmt.Errorf("%s", v.Errors[0].Message)
 	}
 
 	return json.Unmarshal(v.Data, response)
